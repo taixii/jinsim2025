@@ -27,16 +27,16 @@
 
 ## 📂 프로젝트 구조
 
-src/
- ├── pages/
- │    ├── HomePage.js
- │    ├── LoginPage.js
- │    ├── RegisterPage.js
- │    ├── TestsPage.js
- │    ├── TestDetailPage.js
- │    ├── ReservationsPage.js
- │    └── AdminPage.js
- ├── components/
- │    └── App.js
- └── index.js
+src/  
+ ├── pages/  
+ │    ├── HomePage.js  
+ │    ├── LoginPage.js  
+ │    ├── RegisterPage.js  
+ │    ├── TestsPage.js  
+ │    ├── TestDetailPage.js  
+ │    ├── ReservationsPage.js  
+ │    └── AdminPage.js  
+ ├── components/  
+ │    └── App.js  
+ └── index.js  
 
