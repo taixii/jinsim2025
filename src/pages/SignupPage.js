@@ -2,10 +2,17 @@ import { useState } from "react";
 
 function SignupPage() {
   const [userType, setUserType] = useState("student");
+
   const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [nameError, setNameError] = useState("");
+  const [userIdError, setUserIdError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
   const [phone, setPhone] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [highSchool, setHighSchool] = useState("");
@@ -19,9 +26,76 @@ function SignupPage() {
 
   const [visibleModal, setVisibleModal] = useState(null); // "terms", "privacy", etc.
 
+  const validateName = () => {
+    if (!name.trim()) {
+      setNameError("이름을 입력해주세요.");
+      return false;
+    }
+    const nameRegex = /^[가-힣a-zA-Z]{2,}$/;
+    if (!nameRegex.test(name)) {
+      setNameError("이름은 2자 이상의 한글 또는 영문이어야 합니다.");
+      return false;
+    }
+    setNameError("");
+    return true;
+  };
+
+  const validateUserId = () => {
+    if (!userId.trim()) {
+      setUserIdError("아이디를 입력해주세요.");
+      return false;
+    }
+    const userIdRegex = /^[a-zA-Z0-9]{6,}$/;
+    if (!userIdRegex.test(userId)) {
+      setUserIdError("아이디는 영문 또는 영문+숫자 조합의 6자 이상이어야 합니다.");
+      return false;
+    }
+    setUserIdError("");
+    return true;
+  };
+
+  const validatePassword = () => {
+    const count =
+      [/[A-Z]/, /[a-z]/, /[0-9]/, /[!@#$%^&*(),.?":{}|<>]/].filter((regex) =>
+        regex.test(password)
+      ).length;
+
+    if (password.length < 8 || count < 3) {
+      setPasswordError(
+        "비밀번호는 8자 이상이며, 대문자/소문자/숫자/특수문자 중 3가지 이상 포함해야 합니다."
+      );
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
+  const validateConfirmPassword = () => {
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
+      return false;
+    }
+    setConfirmPasswordError("");
+    return true;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("회원가입 제출");
+
+    const isNameValid = validateName();
+    const isUserIdValid = validateUserId();
+    const isPasswordValid = validatePassword();
+    const isConfirmValid = validateConfirmPassword();
+
+    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid) {
+      console.log("회원가입 정보:", {
+        userId,
+        password,
+      });
+      alert("회원가입 정보가 유효합니다.");
+    } else {
+      alert("입력값을 다시 확인해주세요.");
+    }
   };
 
   const requiredMark = <span style={{ color: "red" }}>*</span>;
@@ -64,7 +138,10 @@ function SignupPage() {
             placeholder="이름"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={validateName}
+            required
           />
+          {nameError && <div style={{ color: "red" }}>{nameError}</div>}
         </div>
 
         {/* 아이디 + 중복 확인 버튼 */}
@@ -75,8 +152,11 @@ function SignupPage() {
             placeholder="6자 이상, 영문 또는 영문+숫자"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
+            onBlur={validateUserId}
+            required
           />
           <button type="button">중복 확인</button>
+          {userIdError && <div style={{ color: "red" }}>{userIdError}</div>}
         </div>
 
         {/* 비밀번호 */}
@@ -87,7 +167,9 @@ function SignupPage() {
             placeholder="8자 이상, 대소문자/숫자/특수문자 중 3가지 조합"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={validatePassword}
           />
+          {passwordError && <div style={{ color: "red" }}>{passwordError}</div>}
         </div>
 
         {/* 비밀번호 확인 */}
@@ -98,7 +180,11 @@ function SignupPage() {
             placeholder="비밀번호 확인"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            onBlur={validateConfirmPassword}
           />
+          {confirmPasswordError && (
+            <div style={{ color: "red" }}>{confirmPasswordError}</div>
+          )}
         </div>
 
         {/* 휴대폰 번호 */}
