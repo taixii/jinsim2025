@@ -16,7 +16,11 @@ function SignupPage() {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const [phone, setPhone] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [sentCode, setSentCode] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [codeError, setCodeError] = useState("");
+
   const [highSchool, setHighSchool] = useState("");
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreements, setAgreements] = useState({
@@ -64,7 +68,22 @@ function SignupPage() {
     }
   }, [validateUserId, userId]);
 
-  const validatePassword = () => {
+  const checkDuplicateId = () => {
+    if (!userId) {
+      alert("아이디를 입력해 주세요.");
+      return;
+    }
+    const isDuplicate = existingUserIds.includes(userId);
+    if (isDuplicate) {
+      alert("이미 사용 중인 아이디입니다.");
+      setIsIdChecked(false);
+    } else {
+      alert("사용 가능한 아이디입니다.");
+      setIsIdChecked(true);
+    }
+  };
+
+  const validatePassword = useCallback(() => {
     const count =
       [/[A-Z]/, /[a-z]/, /[0-9]/, /[!@#$%^&*(),.?":{}|<>]/].filter((regex) =>
         regex.test(password)
@@ -78,29 +97,60 @@ function SignupPage() {
     }
     setPasswordError("");
     return true;
-  };
+  }, [password]);
 
-  const validateConfirmPassword = () => {
+  useEffect(() => {
+    if (password !== "") {
+      validatePassword();
+    }
+  }, [validatePassword, password]);
+
+  const validateConfirmPassword = useCallback(() => {
     if (password !== confirmPassword) {
       setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
       return false;
     }
     setConfirmPasswordError("");
     return true;
+  }, [password, confirmPassword]);
+
+  useEffect(() => {
+    if (confirmPassword !== "") {
+      validateConfirmPassword();
+    }
+  }, [validateConfirmPassword, confirmPassword]);
+
+  
+
+  const validatePhone = useCallback(() => {
+    const phoneRegex = /^010\d{8}$/;
+    if (!phoneRegex.test(phone)) {
+      setPhoneError("휴대폰 번호 형식이 올바르지 않습니다. (예: 01012345678)");
+      return false;
+    }
+    setPhoneError("");
+    return true;
+  }, [phone]);
+
+  useEffect(() => {
+    if (phone !== "") {
+      validatePhone();
+    }
+  }, [validatePhone, phone]);
+
+  const handleSendCode = () => {
+    if (!validatePhone()) return;
+    setSentCode("123456");
+    setCodeError("");
+    alert("인증번호를 발송했습니다. (테스트용: 123456)");
   };
 
-  const checkDuplicateId = () => {
-    if (!userId) {
-      alert("아이디를 입력해 주세요.");
-      return;
-    }
-    const isDuplicate = existingUserIds.includes(userId);
-    if (isDuplicate) {
-      alert("이미 사용 중인 아이디입니다.");
-      setIsIdChecked(false);
+  const handleVerifyCode = () => {
+    if (inputCode !== sentCode) {
+      setCodeError("인증번호가 일치하지 않습니다.");
     } else {
-      alert("사용 가능한 아이디입니다.");
-      setIsIdChecked(true);
+      setCodeError("");
+      alert("인증이 완료되었습니다.");
     }
   };
 
@@ -224,8 +274,12 @@ function SignupPage() {
             placeholder="휴대폰 번호 (- 없이 숫자만)"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            onBlur={validatePhone}
           />
-          <button type="button">인증번호 받기</button>
+          <button type="button" onClick={handleSendCode}>인증번호 받기</button>
+          {phoneError && (
+            <div style={{ color: "red" }}>{phoneError}</div>
+          )}
         </div>
 
         {/* 인증번호 */}
@@ -234,10 +288,11 @@ function SignupPage() {
           <input
             type="text"
             placeholder="인증번호 입력"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
+            value={inputCode}
+            onChange={(e) => setInputCode(e.target.value)}
           />
-          <button type="button">인증번호 확인</button>
+          <button type="button" onClick={handleVerifyCode}>인증번호 확인</button>
+          {codeError && <div style={{ color: "red" }}>{codeError}</div>}
         </div>
 
         {/* 고등학교 검색 */}
