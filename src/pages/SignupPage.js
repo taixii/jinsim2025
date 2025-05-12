@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 function SignupPage() {
   const [userType, setUserType] = useState("student");
@@ -7,6 +7,8 @@ function SignupPage() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [isIdChecked, setIsIdChecked] = useState(false);
 
   const [nameError, setNameError] = useState("");
   const [userIdError, setUserIdError] = useState("");
@@ -26,6 +28,8 @@ function SignupPage() {
 
   const [visibleModal, setVisibleModal] = useState(null); // "terms", "privacy", etc.
 
+  const existingUserIds = ['user123', 'testuser', 'abc123'];
+
   const validateName = () => {
     if (!name.trim()) {
       setNameError("이름을 입력해주세요.");
@@ -40,7 +44,7 @@ function SignupPage() {
     return true;
   };
 
-  const validateUserId = () => {
+  const validateUserId = useCallback(() => {
     if (!userId.trim()) {
       setUserIdError("아이디를 입력해주세요.");
       return false;
@@ -52,7 +56,13 @@ function SignupPage() {
     }
     setUserIdError("");
     return true;
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId !== "") {
+      validateUserId();
+    }
+  }, [validateUserId, userId]);
 
   const validatePassword = () => {
     const count =
@@ -79,6 +89,21 @@ function SignupPage() {
     return true;
   };
 
+  const checkDuplicateId = () => {
+    if (!userId) {
+      alert("아이디를 입력해 주세요.");
+      return;
+    }
+    const isDuplicate = existingUserIds.includes(userId);
+    if (isDuplicate) {
+      alert("이미 사용 중인 아이디입니다.");
+      setIsIdChecked(false);
+    } else {
+      alert("사용 가능한 아이디입니다.");
+      setIsIdChecked(true);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -87,14 +112,15 @@ function SignupPage() {
     const isPasswordValid = validatePassword();
     const isConfirmValid = validateConfirmPassword();
 
-    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid) {
+    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid && isIdChecked) {
       console.log("회원가입 정보:", {
         userId,
         password,
       });
       alert("회원가입 정보가 유효합니다.");
     } else {
-      alert("입력값을 다시 확인해주세요.");
+      if (!isIdChecked) alert("아이디 중복 확인을 해 주세요.");
+      else alert("입력값을 다시 확인해 주세요.");
     }
   };
 
@@ -151,11 +177,14 @@ function SignupPage() {
             type="text"
             placeholder="6자 이상, 영문 또는 영문+숫자"
             value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            onChange={(e) => {
+              setUserId(e.target.value);
+              setIsIdChecked(false);
+            }}
             onBlur={validateUserId}
             required
           />
-          <button type="button">중복 확인</button>
+          <button type="button" onClick={checkDuplicateId} disabled={userIdError}>중복 확인</button>
           {userIdError && <div style={{ color: "red" }}>{userIdError}</div>}
         </div>
 
