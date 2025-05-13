@@ -34,6 +34,13 @@ function SignupPage() {
     newsletter: false,
   });
 
+  useEffect(() => {
+    const allChecked = Object.values(agreements).every((value) => value);
+    setAgreeAll(allChecked);
+  }, [agreements]);
+
+  const [termsError, setTermsError] = useState("");
+
   const [visibleModal, setVisibleModal] = useState(null); // "terms", "privacy", etc.
 
   const existingUserIds = ['user123', 'testuser', 'abc123'];
@@ -178,6 +185,16 @@ function SignupPage() {
     }
   }, [validateSchool, schoolName]);
 
+  const validateTerms = () => {
+    if (!agreements.terms || !agreements.privacy) {
+      setTermsError("필수 약관에 모두 동의해야 합니다.");
+      return false;
+    }
+    setTermsError("");
+    return true;
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -186,13 +203,22 @@ function SignupPage() {
     const isPasswordValid = validatePassword();
     const isConfirmValid = validateConfirmPassword();
     const isSchoolValid = validateSchool();
+    const isTermsValid = validateTerms();
 
-    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid && isIdChecked && isSchoolValid) {
-      console.log("회원가입 정보:", {
-        userId,
-        password,
-      });
-      alert("회원가입 정보가 유효합니다.");
+    if (
+      isNameValid &&
+      isUserIdValid &&
+      isPasswordValid &&
+      isConfirmValid &&
+      isIdChecked &&
+      isSchoolValid &&
+      isTermsValid
+    ) {
+        console.log("회원가입 정보:", {
+          userId,
+          password,
+        });
+        alert("회원가입 성공");
     } else {
       if (!isIdChecked) alert("아이디 중복 확인을 해 주세요.");
       else alert("입력값을 다시 확인해 주세요.");
@@ -337,85 +363,88 @@ function SignupPage() {
             <SchoolSearchModal onSelect={handleSchoolSelect} onClose={() => setIsSchoolModalOpen(false)} />
           )}
         </div>
-
-        {/* 약관 동의 전체 */}
+          
         <div>
-          <label>
-            <input
-              type="checkbox"
-              checked={agreeAll}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setAgreeAll(checked);
-                setAgreements({
-                  terms: checked,
-                  privacy: checked,
-                  marketing: checked,
-                  newsletter: checked,
-                });
-              }}
-            />
-            이용약관, 정보 활용 및 개인정보 활용에 대해 모두 동의합니다.
-          </label>
-        </div>
+          {/* 약관 동의 전체 */}
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={agreeAll}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setAgreeAll(checked);
+                  setAgreements({
+                    terms: checked,
+                    privacy: checked,
+                    marketing: checked,
+                    newsletter: checked,
+                  });
+                }}
+              />
+              이용약관, 정보 활용 및 개인정보 활용에 대해 모두 동의합니다.
+            </label>
+          </div>
 
-        {/* 개별 약관 */}
-        <div style={{ marginLeft: "1rem" }}>
-          <label>
-            <input
-              type="checkbox"
-              checked={agreements.terms}
-              onChange={(e) =>
-                setAgreements({ ...agreements, terms: e.target.checked })
-              }
-            />
-            (필수) 이용약관 동의{requiredMark}{" "}
-            <button type="button" onClick={() => setVisibleModal("terms")}>
-              자세히보기
-            </button>
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={agreements.privacy}
-              onChange={(e) =>
-                setAgreements({ ...agreements, privacy: e.target.checked })
-              }
-            />
-            (필수) 개인정보 수집 및 활용 동의{requiredMark}{" "}
-            <button type="button" onClick={() => setVisibleModal("privacy")}>
-              자세히보기
-            </button>
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={agreements.marketing}
-              onChange={(e) =>
-                setAgreements({ ...agreements, marketing: e.target.checked })
-              }
-            />
-            (선택) 마케팅 정보 수신 동의{" "}
-            <button type="button" onClick={() => setVisibleModal("marketing")}>
-              자세히보기
-            </button>
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={agreements.newsletter}
-              onChange={(e) =>
-                setAgreements({ ...agreements, newsletter: e.target.checked })
-              }
-            />
-            (선택) 뉴스레터 구독 동의{" "}
-            <button type="button" onClick={() => setVisibleModal("newsletter")}>
-              자세히보기
-            </button>
-          </label>
+          {/* 개별 약관 */}
+          <div style={{ marginLeft: "1rem" }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.terms}
+                onChange={(e) =>
+                  setAgreements({ ...agreements, terms: e.target.checked })
+                }
+              />
+              (필수) 이용약관 동의{requiredMark}{" "}
+              <button type="button" onClick={() => setVisibleModal("terms")}>
+                자세히보기
+              </button>
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.privacy}
+                onChange={(e) =>
+                  setAgreements({ ...agreements, privacy: e.target.checked })
+                }
+              />
+              (필수) 개인정보 수집 및 활용 동의{requiredMark}{" "}
+              <button type="button" onClick={() => setVisibleModal("privacy")}>
+                자세히보기
+              </button>
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.marketing}
+                onChange={(e) =>
+                  setAgreements({ ...agreements, marketing: e.target.checked })
+                }
+              />
+              (선택) 마케팅 정보 수신 동의{" "}
+              <button type="button" onClick={() => setVisibleModal("marketing")}>
+                자세히보기
+              </button>
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.newsletter}
+                onChange={(e) =>
+                  setAgreements({ ...agreements, newsletter: e.target.checked })
+                }
+              />
+              (선택) 뉴스레터 구독 동의{" "}
+              <button type="button" onClick={() => setVisibleModal("newsletter")}>
+                자세히보기
+              </button>
+            </label>
+          </div>
+          {termsError && <div style={{ color: "red" }}>{termsError}</div>}
         </div>
 
         {/* 제출 버튼 */}
