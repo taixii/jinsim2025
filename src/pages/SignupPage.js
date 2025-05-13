@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import SchoolSearchModal from "./SchoolSearchModal";
 
 function SignupPage() {
   const [userType, setUserType] = useState("student");
@@ -21,7 +22,10 @@ function SignupPage() {
   const [phoneError, setPhoneError] = useState("");
   const [codeError, setCodeError] = useState("");
 
-  const [highSchool, setHighSchool] = useState("");
+  const [schoolName, setSchoolName] = useState("");
+  const [schoolError, setSchoolError] = useState("");
+  const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false);
+  
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreements, setAgreements] = useState({
     terms: false,
@@ -154,6 +158,26 @@ function SignupPage() {
     }
   };
 
+  const handleSchoolSelect = (selectedSchool) => {
+    setSchoolName(selectedSchool);
+    setIsSchoolModalOpen(false);
+  };
+
+  const validateSchool = useCallback(() => {
+    if (!schoolName.trim()) {
+      setSchoolError("출신 고등학교를 선택해주세요.");
+      return false;
+    }
+    setSchoolError("");
+    return true;
+  }, [schoolName]);
+
+  useEffect(() => {
+    if (schoolName !== "") {
+      validateSchool();
+    }
+  }, [validateSchool, schoolName]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -161,8 +185,9 @@ function SignupPage() {
     const isUserIdValid = validateUserId();
     const isPasswordValid = validatePassword();
     const isConfirmValid = validateConfirmPassword();
+    const isSchoolValid = validateSchool();
 
-    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid && isIdChecked) {
+    if (isNameValid && isUserIdValid && isPasswordValid && isConfirmValid && isIdChecked && isSchoolValid) {
       console.log("회원가입 정보:", {
         userId,
         password,
@@ -297,13 +322,20 @@ function SignupPage() {
 
         {/* 고등학교 검색 */}
         <div>
-          <label>출신 고등학교{requiredMark} </label>
-          <input
-            type="text"
-            placeholder="출신 고등학교"
-            value={highSchool}
-            onChange={(e) => setHighSchool(e.target.value)}
-          />
+          <label>응시생 출신 고등학교{requiredMark} </label>
+          <div>
+            <input type="text" value={schoolName} readOnly />
+            <button type="button" onClick={() => setIsSchoolModalOpen(true)}>
+          학교 검색
+            </button>
+          </div>
+          {schoolError && (
+            <div style={{ color: "red", fontSize: "0.9rem" }}>{schoolError}</div>
+          )}
+
+          {isSchoolModalOpen && (
+            <SchoolSearchModal onSelect={handleSchoolSelect} onClose={() => setIsSchoolModalOpen(false)} />
+          )}
         </div>
 
         {/* 약관 동의 전체 */}
