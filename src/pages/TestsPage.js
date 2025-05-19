@@ -22,22 +22,16 @@ function TestsPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>모의수능 예약</h2>
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+    <div className="px-4 py-8 max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">모의수능 예약</h2>
+      <div className="flex flex-col gap-6">
         {testData.map((test) => (
           <div
             key={test.id}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "1rem",
-              width: "250px",
-              cursor: "pointer",
-            }}
+            className="border border-gray-300 rounded-xl p-6 shadow-sm hover:bg-gray-50 transition cursor-pointer"
             onClick={() => navigate(`/tests/${test.id}`)}
           >
-            <h3>{test.date}</h3>
+            <h3 className="text-lg font-semibold mb-2">{test.date}</h3>
             <p>🪑 잔여 좌석: {test.seats}</p>
             <p>🕒 시간: {test.time}</p>
             <p>🏫 장소: {test.location}</p>
