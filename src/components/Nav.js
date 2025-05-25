@@ -7,8 +7,11 @@ export default function Nav() {
       <div className="flex gap-6 text-sm font-medium">
         <Link to="/tests">예약하기</Link>
         <Link to="/my">마이페이지</Link>
-        <Link to="/login">로그인</Link>
-        <Link to="/signup">회원가입</Link>
+        <div>
+          <Link to="/login">로그인</Link>
+          /
+          <Link to="/signup">회원가입</Link>
+        </div>
       </div>
     </nav>
   );
