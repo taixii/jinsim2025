@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  role: {
+  userType: {
     type: String,
     enum: ["student", "parent"],
     required: true
