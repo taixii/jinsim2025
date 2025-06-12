@@ -1,0 +1,14 @@
+### 회원가입 요청 예시
+POST http://localhost:4000/api/signup
+Content-Type: application/json
+
+{
+  "userType": "student",
+  "username": "testuser1",
+  "password": "testpw123",
+  "name": "김진심",
+  "phone": "01012345678",
+  "school": "서울고등학교",
+  "agreeMarketing": true,
+  "isAdmin": false
+}
