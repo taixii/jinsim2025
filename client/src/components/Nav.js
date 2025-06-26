@@ -1,18 +1,21 @@
 import { Link } from "react-router-dom";
 
-export default function Nav() {
+function Nav() {
   return (
-    <nav className="w-full px-6 py-4 flex justify-between items-center shadow-md">
+    <nav className="flex justify-between items-center p-4 border-b border-white">
       <Link to="/" className="text-xl font-bold">진심모의수능</Link>
-      <div className="flex gap-6 text-sm font-medium">
-        <Link to="/tests">예약하기</Link>
-        <Link to="/my">마이페이지</Link>
-        <div>
-          <Link to="/login">로그인</Link>
-          /
-          <Link to="/signup">회원가입</Link>
-        </div>
+      <div className="flex gap-4">
+        {['about', 'tests', 'search'].map((route, i) => (
+          <Link
+            key={i}
+            to={`/${route}`}
+          >
+            <button>{route === 'about' ? 'About' : route === 'tests' ? '신청하기' : '신청내역 확인'}</button>
+          </Link>
+        ))}
       </div>
     </nav>
   );
 }
+
+export default Nav;
